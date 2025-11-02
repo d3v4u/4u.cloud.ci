@@ -29,7 +29,8 @@ runs:
       shell: bash
       run: |
         GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" \
-        git clone --branch ${{ inputs.branch }} git@github.com:d3v4u/4u.cloud.state.git state-repo
+        # git clone --branch ${{ inputs.branch }} git@github.com:d3v4u/4u.cloud.state.git state-repo
+        git clone git@github.com:d3v4u/4u.cloud.state.${{ inputs.branch }}.git state-repo
 
     - name: Update image version
       shell: bash
@@ -37,9 +38,12 @@ runs:
         set -e
         cd state-repo/${{ inputs.repo-name }}
         SHORT_SHA=$(echo "${{ inputs.commit-sha }}" | cut -c1-7)
-        sed -i "s|image:.*|image: ghcr.io/${{ github.repository_owner }}/${{ inputs.repo-name }}:$SHORT_SHA|" manifest.yaml
+        # sed -i "s|image:.*|image: ghcr.io/${{ github.repository_owner }}/${{ inputs.repo-name }}:$SHORT_SHA|" manifest.yaml
+        sed -i "s|image:.*|image: ghcr.io/${{ github.repository_owner }}/${{ inputs.repo-name }}:$SHORT_SHA|" patch.yaml
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add manifest.yaml
+        # git add manifest.yaml
+        git add patch.yaml
         git commit -m "Update image for ${{ inputs.repo-name }} to $SHORT_SHA"
-        git push origin ${{ inputs.branch }}
+        # git push origin ${{ inputs.branch }}
+        git push
